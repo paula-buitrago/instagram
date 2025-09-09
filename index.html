@@ -1,0 +1,1110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grid Instagram </title>
+    
+    
+    <!--incluir libreria bootstrap css-->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+    <style>
+
+    .stories-container {
+            position: relative;
+            max-width: 100%;
+            margin: 20px auto;
+            padding: 0 50px;
+        }
+
+        .stories-scroll {
+            display: flex;
+            overflow-x: hidden;
+            scroll-behavior: smooth;
+            gap: 15px;
+            padding: 10px 0;
+        }
+
+        .story-item {
+            flex: 0 0 auto;
+            text-align: center;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+
+        .story-item:hover {
+            transform: scale(1.05);
+        }
+
+        .story-avatar {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            border: 3px solid #e91e63;
+            padding: 3px;
+            margin-bottom: 5px;
+            background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .story-avatar img {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            border: 2px solid white;
+            object-fit: cover;
+        }
+
+        .story-username {
+            font-size: 12px;
+            color: #333;
+            max-width: 70px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .scroll-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.9);
+            border: none;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            transition: background-color 0.2s ease;
+            z-index: 10;
+        }
+
+        .scroll-btn:hover {
+            background: white;
+        }
+
+        .scroll-btn.left {
+            left: 10px;
+        }
+
+        .scroll-btn.right {
+            right: 10px;
+        }
+
+        /* Modal de Historia */
+        .story-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .story-viewer {
+            position: relative;
+            max-width: 400px;
+            max-height: 90vh;
+            background: #000;
+            border-radius: 20px;
+            overflow: hidden;
+        }
+
+        .story-header {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            padding: 15px;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.7), transparent);
+            z-index: 10;
+            color: white;
+        }
+
+        .story-progress {
+            display: flex;
+            gap: 2px;
+            margin-bottom: 10px;
+        }
+
+        .progress-bar {
+            flex: 1;
+            height: 2px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 1px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: white;
+            width: 0;
+            transition: width 0.1s linear;
+        }
+
+        .story-user-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .story-user-avatar {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            border: 2px solid white;
+        }
+
+        .story-content {
+            width: 100%;
+            height: 100vh;
+            max-height: 600px;
+            object-fit: cover;
+            display: block;
+        }
+
+        .story-controls {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            display: flex;
+        }
+
+        .story-control {
+            flex: 1;
+            cursor: pointer;
+        }
+
+        .close-story {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            z-index: 20;
+        }
+
+        .story-nav {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(255, 255, 255, 0.8);
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 15;
+        }
+
+        .story-nav.prev {
+            left: 15px;
+        }
+
+        .story-nav.next {
+            right: 15px;
+        }
+    
+    .container-fluid {
+        display: grid;
+        grid-template-columns: repeat(12, 1fr);
+        grid-template-rows: repeat(8, 1fr);
+        gap: 8px;
+        ;
+        
+    }
+        
+    .a 
+    {
+        grid-column: span 2 / span 2;
+        grid-row: span 8 / span 8;
+        /*background-color: #0095f6;*/
+        height: 100 vh;
+        
+    }
+
+    .b {
+        grid-column: span 7 / span 7;
+        grid-column-start: 3;
+        height: 100px;
+        /*background-color: salmon;*/
+        
+    }
+
+    .c {
+        grid-column: span 7 / span 7;
+        grid-row: span 7 / span 7;
+        grid-column-start: 3;
+        grid-row-start: 2;
+        height: 800 px;
+       /* background-color: seagreen;*/
+    }
+
+    .d {
+        grid-column: span 3 / span 3;
+        grid-row: span 8 / span 8;
+        grid-column-start: 10;
+        grid-row-start: 1;
+        height: 100 vh;
+       /* background-color: orangered;*/
+    }
+
+     .mover
+        {
+            margin-left: 20px;
+        }  
+     
+    /* Incorporo el media query de resolucion 1263 el nav se reduce */
+    @media (min-width:767px) and (max-width: 1159px) {
+
+        .container-fluid {
+            display: grid;
+            grid-template-columns: repeat(13, 1fr);
+            grid-template-rows: repeat(12, 1fr);
+            gap: 8px;
+        }
+        
+        
+        .a {
+            grid-column: span 2 / span 2;
+            grid-row: span 8 / span 8;
+            grid-row-start: 1;
+            grid-row-end: 10;
+            height: 100vh;
+            
+        }
+
+        .b {
+            grid-column: span 10 / span 10;
+            grid-row: span 1 / span 1   ;
+            grid-column-start: 3;
+            grid-column-end: 14;
+            grid-row-start: 1;
+            grid-row-end: 1;
+            height: 100%;
+            
+            
+        }
+
+        .c {
+            grid-column: span 10 / span 10;
+            grid-row: span 2 / span 2;
+            grid-column-start: 3;
+            grid-column-end: 14;
+            grid-row-start: 2;
+            grid-row-end: 10;
+            background-color: rgb(6, 88, 195);
+            height: 100vh;
+        }
+
+        .d {
+            display:none; 
+            grid-column: span 0 / span 0;
+            grid-row: span 0 / span 0;
+            grid-column-start: 0;
+            grid-row-start: 0;
+           
+        }
+    }
+    @media (min-width:100px ) and (max-width: 766px) {
+        
+        .container-fluid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            grid-template-rows: repeat(12, 1fr);
+            gap: 7px;
+            
+        }
+            
+        .a {
+            grid-column: span 2 / span 2;
+            grid-column-start: 1;
+            
+            grid-row-start: 10;
+            grid-row-end: 12;
+            
+
+        }
+
+        .b {
+            grid-column: span 2 / span 2;
+            grid-column-start: 1;
+            grid-row-start: 1;
+           
+        
+        }
+
+        .c {
+            grid-column: span 2 / span 2;
+            grid-row: span 6 / span 6;
+            grid-column-start: 1;
+            grid-column-end: 3;
+            grid-row-start:2;
+            grid-row-end:10;
+            height: 100%;
+            
+            gap:0px;
+            
+        }
+        
+        .d {
+            display: none;
+            grid-column: span 3 / span 3;
+            grid-row: span 1 / span 1;
+            grid-column-start: 1;
+            grid-row-start: 2;
+            height: 80px;
+        }
+
+    }       
+        /* Estilos para el carrusel de historias */ 
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+             background: #fafafa; 
+            padding: 20px;
+        }
+
+        .stories-container {
+            border-radius: 8px;
+            padding: 16px;
+            max-width: 614px;
+            margin: 0 auto;
+        }
+
+        .stories-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        
+
+        .following-btn {
+            background: none;
+            border: none;
+            color: #0095f6;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .stories-scroll {
+            display: flex;
+            gap: 16px;
+            overflow-x: auto;
+            padding-bottom: 8px;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+
+        .stories-scroll::-webkit-scrollbar {
+            display: none;
+        }
+
+        .story-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            min-width: 66px;
+            cursor: pointer;
+        }
+
+        .story-avatar {
+            width: 66px;
+            height: 66px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
+            padding: 2px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.2s ease;
+        }
+
+        .story-avatar:hover {
+            transform: scale(1.05);
+        }
+
+        .story-avatar img {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            border: 2px solid white;
+            object-fit: cover;
+        }
+
+        .story-username {
+            font-size: 12px;
+            color: #262626;
+            text-align: center;
+            max-width: 66px;
+            overflow: hidden;
+            text-overflow:unset;
+            white-space: nowrap;
+            display: flex;
+            align-items: center;
+        }
+
+        .scroll-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(255, 255, 255, 0.9);
+            border: 1px solid #dbdbdb;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            z-index: 10;
+        }
+
+        .scroll-btn.left {
+            left: -12px;
+        }
+
+        .scroll-btn.right {
+            right: -12px;
+        }
+
+        .stories-wrapper {
+            position: relative;
+        }
+    
+
+         
+    </style>
+</head>
+<body>
+    
+
+
+<div class="container-fluid">
+    <nav class="a">
+        <img src="iconos/ignombre.png" alt="logo ig" width="180" height="130"> 
+        <br>
+        
+        <a class="btn btn-light " href="#" role="button"> 
+            <img src="iconos/inicio.svg" alt="" width="20px" >
+            &nbsp; <strong>Inicio</strong></a>
+
+        <br>
+        <a class="btn btn-light " href="#" role="button"> 
+            <img src="iconos/search.png" alt="" width="20px" >
+            &nbsp; Búsqueda</a>
+        <br>
+        <a class="btn btn-light " href="#" role="button" > 
+            <img src="iconos/compass.svg" alt="" width="20px" >
+            &nbsp; Explorar </a>
+            
+        <br>
+        
+        <a class="btn btn-light " href="#" role="button"> 
+            <img src="iconos/video.png" alt="" width="20px" >
+            &nbsp; Reels</a>
+        <br>
+        <a class="btn btn-light " href="#" role="button"> 
+            <img src="iconos/mensajes.png" alt="" width="20px" >
+            &nbsp; Mensajes</a>
+        <br>
+        <a class="btn btn-light " href="#" role="button" > 
+            <img src="iconos/heart.png" alt="" width="20px" >
+            &nbsp; Notificaciones</a>
+        <br>
+        <a class="btn btn-light " href="#" role="button"> 
+            <img src="iconos/add.png" alt="" width="20px" >
+            &nbsp; Crear</a>
+        <br>
+        <a class="btn btn-light " href="#" role="button">
+            <img src="iconos/user.png" alt="" width="20px" >
+            &nbsp;Perfil</a>
+       
+       
+        <br>
+     
+       
+
+        <div class="mover">
+                
+            <a class="btn btn-light" href="#" role="button">
+            
+            
+            <img src="iconos/threads.png" alt="" width="20px" >
+            &nbsp; Threads</a>
+            <br>
+            <a class="btn btn-light" href="#" role="button">
+                <img src="iconos/menu.png" alt="" width="20px" >
+                &nbsp; Más</a>
+            
+            
+        </div>
+        
+    </nav>
+    <header class="b">
+        <div class="container">
+        
+        
+        <div class="stories-container">
+            <button class="scroll-btn left" onclick="scrollStories(-1)">
+                &#8249;
+            </button>
+            
+            <div class="stories-scroll" id="storiesScroll">
+                <!-- Historias de ejemplo -->
+                <div class="story-item" onclick="openStory('parkbogum', 0)">
+                    <div class="story-avatar">
+                        <img src="iconos/perfil4.jpg" alt="María">
+                    </div>
+                    <div class="story-username">bogummy</div>
+                </div>
+                
+                <div class="story-item" onclick="openStory('samdoesarts', 1)">
+                    <div class="story-avatar">
+                        <img src="iconos/perfil2.jpg" alt="samdoesarts">
+                    </div>
+                    <div class="story-username">samdoesarts</div>
+                </div>
+                
+                <div class="story-item" onclick="openStory('humbe', 2)">
+                    <div class="story-avatar">
+                        <img src="iconos/perfil5.jpg" alt="humbe">
+                    </div>
+                    <div class="story-username">humbe</div>
+                </div>
+                
+                <div class="story-item" onclick="openStory('5sos', 3)">
+                    <div class="story-avatar">
+                        <img src="iconos/perfil3.jpg" alt="5sos">
+                    </div>
+                    <div class="story-username">5sos</div>
+                </div>
+                
+                <div class="story-item" onclick="openStory('nasa', 4)">
+                    <div class="story-avatar">
+                        <img src="iconos/nasa.jpg" alt="nasa">
+                    </div>
+                    <div class="story-username">nasa</div>
+                </div>
+                
+                <div class="story-item" onclick="openStory('farid_dieck', 5)">
+                    <div class="story-avatar">
+                        <img src="iconos/farid.jpg" alt="Farid dieck">
+                    </div>
+                    <div class="story-username">farid_dieck</div>
+                </div>
+                
+                <div class="story-item" onclick="openStory('kwakdongyen0', 6)">
+                    <div class="story-avatar">
+                        <img src="iconos/perfil1.jpg" alt="kwakdongyen0">
+                    </div>
+                    <div class="story-username">kwakdongyen0</div>
+                </div>
+                
+                <div class="story-item" onclick="openStory('leesoohyuk', 7)">
+                    <div class="story-avatar">
+                        <img src="iconos/perfil8.jpg" alt="leesoohyuk">
+                    </div>
+                    <div class="story-username">leesoohyuk</div>
+                </div>
+            </div>
+            
+            <button class="scroll-btn right" onclick="scrollStories(1)">
+                &#8250;
+            </button>
+        </div>
+    </div>
+
+    <!-- Modal para ver historias -->
+    <div class="story-modal" id="storyModal">
+        <div class="story-viewer">
+            <div class="story-header">
+                <div class="story-progress" id="storyProgress">
+                    <!-- Barras de progreso se generan dinámicamente -->
+                </div>
+                <div class="story-user-info">
+                    <img class="story-user-avatar" id="storyUserAvatar" src="" alt="">
+                    <span id="storyUsername">Usuario</span>
+                    <span id="storyTime" style="margin-left: auto; font-size: 12px; opacity: 0.8;">2h</span>
+                </div>
+            </div>
+            
+            <img class="story-content" id="storyContent" src="" alt="">
+            
+            <div class="story-controls">
+                <div class="story-control" onclick="previousStorySegment()"></div>
+                <div class="story-control" onclick="nextStorySegment()"></div>
+            </div>
+            
+            <button class="close-story" onclick="closeStory()">×</button>
+            <button class="story-nav prev" onclick="previousUser()">&#8249;</button>
+            <button class="story-nav next" onclick="nextUser()">&#8250;</button>
+        </div>
+    </div>
+
+    <script>
+        // Datos de ejemplo para las historias
+        const storiesData = {
+            'parkbogum': {
+                username: 'bogummy',
+                avatar: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ39l0-m8Ycv07c-YzlOJEtce3FP8nQqI2ctr38K1s245DNqJQy4XXl-gdXGPKRNpTTMEUl0V_Qd6CzYb2zMuLRQ8TVU2aScpFCa0dr8g',
+                stories: [
+                    'https://i.pinimg.com/564x/7e/2b/b2/7e2bb26c3e9dd6000891b6c060f9f6c5.jpg',
+                    'https://i.pinimg.com/originals/8c/f9/a5/8cf9a5c4bc4d3c75797b4fe5f186bf0e.jpg',
+                    'https://cdn-images.dzcdn.net/images/cover/6f5c949a509a389017b2d3b7a8373089/0x1900-000000-80-0-0.jpg'
+                ]
+            },
+            'samdoesarts': {
+                username: 'samdoesarts',
+                avatar: 'https://pbs.twimg.com/profile_images/1813252340058636288/oIDKAShp_400x400.jpg',
+                stories: [
+                    'https://pbs.twimg.com/media/FcJUYEGWIAA-naf.jpg:large',
+                    'https://images.squarespace-cdn.com/content/v1/54fc8146e4b02a22841f4df7/1697499362899-MQ1N7ZHVCZGYHOPZHL26/Art_of_Sam_Yang_18.jpeg'
+                ]
+            },
+            'humbe': {
+                username: 'humbe',
+                avatar: '',
+                stories: [
+                    'https://media.vogue.mx/photos/67ec1306d6f4e387c19f34c0/1:1/w_2667,h_2667,c_limit/Humbe-010%5Bok%5D.jpg',
+                    'https://mrevistademilenio.com/wp-content/uploads/2025/07/Humbe_5.jpg.webp',
+                    'https://i.pinimg.com/736x/48/cb/9d/48cb9d46dbf63c70db7c4f72c2136e42.jpg',
+                    'https://i.pinimg.com/736x/49/31/2d/49312d6b02a15080bf7066f4e7b3694f.jpg'
+                ]
+            },
+            '5sos': {
+                username: '5sos',
+                avatar: 'https://www.aboutmusiic.com/wp-content/uploads/2023/04/5-SOS-Facebook.jpg',
+                stories: [
+                    'https://revistakuadro.com/wp-content/uploads/2022/05/5-seconds-of-summer.jpeg'
+                    
+                ]
+            },
+            'nasa': {
+                username: 'nasa',
+                avatar: 'https://cdn11.bigcommerce.com/s-avwfcqko0c/images/stencil/1280x1280/products/1178/2846/20210312_094627__33985.1615588055.1280.1280__81136.1689802308.jpg?c=2',
+                stories: [
+                    'https://static.scientificamerican.com/dam/m/115e9361b4f0cbed/original/NGC-604.jpg?m=1736436990.163&w=600',
+                    'https://plus.unsplash.com/premium_photo-1676607444703-92110b5faf7d?fm=jpg&q=60&w=3000&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MXx8bmFzYXxlbnwwfHwwfHx8MA%3D%3D',
+                    'https://cdn.pixabay.com/photo/2016/01/11/15/18/toy-1133756_1280.jpg'
+                ]
+            },
+            'farid_dieck': {
+                username: 'farid_dieck',
+                avatar: 'https://yt3.googleusercontent.com/qmoWBW0_ks8wdxPASF4OpyeJ-2QMBp8KI0UcprJ4NtJNnqYrfVrqJY2UU53pt6hQHLBW14nsRA=s900-c-k-c0x00ffffff-no-rj',
+                stories: [
+                    'https://i.scdn.co/image/ab6765630000ba8a35cc841b4268b2e12f8f3951',
+                    'https://xpot.sv/wp-content/uploads/2025/05/farid-y-jessica.jpg '
+                ]
+            },
+            'kwakdongyen0': {
+                username: 'kwakdongyen0',
+                avatar: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTQ3zASPWiTuXXbdUCWZxmHDr90OSE2Ii7mRA&s',
+                stories: [
+                    'https://i.pinimg.com/736x/92/70/1d/92701dd18c3d9baad9c21b2c0fbef84c.jpg'
+                ]
+            },
+            'leesoohyuk': {
+                username: 'leesoohyuk',
+                avatar: '',
+                stories: [
+                    'https://www.lavanguardia.com/peliculas-series/images/profile/1988/5/w1280/70GcUYBv7ru7feswAFya0Lt3KV6.jpg',
+                    'https://images.mubicdn.net/images/cast_member/439892/cache-195206-1653034386/image-w856.jpg'
+                ]
+            }
+        };
+
+        
+        function scrollStories(direction) {
+            const scrollAmount = 200;
+            scrollContainer.scrollBy({
+                left: direction * scrollAmount,
+                behavior: 'smooth'
+            });
+        }
+
+        function updateScrollButtons() {
+            const { scrollLeft, scrollWidth, clientWidth } = scrollContainer;
+            
+            leftBtn.style.display = scrollLeft > 0 ? 'flex' : 'none';
+            rightBtn.style.display = scrollLeft < scrollWidth - clientWidth - 1 ? 'flex' : 'none';
+        }
+
+        function openStory(username, userIndex) {
+            currentUser = username;
+            currentUserIndex = userIndex;
+            currentStoryIndex = 0;
+            
+            const userData = storiesData[username];
+            document.getElementById('storyUsername').textContent = userData.username;
+            document.getElementById('storyUserAvatar').src = userData.avatar;
+            
+            createProgressBars(userData.stories.length);
+            loadStoryContent();
+            
+            storyModal.style.display = 'flex';
+            startStoryTimer();
+        }
+
+        function createProgressBars(count) {
+            const progressContainer = document.getElementById('storyProgress');
+            progressContainer.innerHTML = '';
+            
+            for (let i = 0; i < count; i++) {
+                const progressBar = document.createElement('div');
+                progressBar.className = 'progress-bar';
+                progressBar.innerHTML = '<div class="progress-fill"></div>';
+                progressContainer.appendChild(progressBar);
+            }
+        }
+
+        function loadStoryContent() {
+            const userData = storiesData[currentUser];
+            const storyContent = document.getElementById('storyContent');
+            storyContent.src = userData.stories[currentStoryIndex];
+            
+            updateProgressBars();
+        }
+
+        function updateProgressBars() {
+            const progressBars = document.querySelectorAll('.progress-fill');
+            const userData = storiesData[currentUser];
+            
+            progressBars.forEach((bar, index) => {
+                if (index < currentStoryIndex) {
+                    bar.style.width = '100%';
+                } else if (index === currentStoryIndex) {
+                    bar.style.width = '0%';
+                    // Animar la barra actual
+                    setTimeout(() => {
+                        bar.style.transition = 'width 5s linear';
+                        bar.style.width = '100%';
+                    }, 100);
+                } else {
+                    bar.style.width = '0%';
+                }
+            });
+        }
+
+        function startStoryTimer() {
+            clearTimeout(storyTimer);
+            storyTimer = setTimeout(() => {
+                nextStorySegment();
+            }, 5000); // 5 segundos por historia
+        }
+
+        function nextStorySegment() {
+            const userData = storiesData[currentUser];
+            
+            if (currentStoryIndex < userData.stories.length - 1) {
+                currentStoryIndex++;
+                loadStoryContent();
+                startStoryTimer();
+            } else {
+                nextUser();
+            }
+        }
+
+        function previousStorySegment() {
+            if (currentStoryIndex > 0) {
+                currentStoryIndex--;
+                loadStoryContent();
+                startStoryTimer();
+            } else {
+                previousUser();
+            }
+        }
+
+        function nextUser() {
+            if (currentUserIndex < usersList.length - 1) {
+                currentUserIndex++;
+                openStory(usersList[currentUserIndex], currentUserIndex);
+            } else {
+                closeStory();
+            }
+        }
+
+        function previousUser() {
+            if (currentUserIndex > 0) {
+                currentUserIndex--;
+                const userData = storiesData[usersList[currentUserIndex]];
+                currentStoryIndex = userData.stories.length - 1; // Ir al final de las historias del usuario anterior
+                openStory(usersList[currentUserIndex], currentUserIndex);
+            }
+        }
+
+        function closeStory() {
+            storyModal.style.display = 'none';
+            clearTimeout(storyTimer);
+            currentUser = null;
+            currentStoryIndex = 0;
+        }
+
+        // Event listeners
+        scrollContainer.addEventListener('scroll', updateScrollButtons);
+        window.addEventListener('resize', updateScrollButtons);
+
+        // Cerrar modal al hacer clic fuera
+        storyModal.addEventListener('click', (e) => {
+            if (e.target === storyModal) {
+                closeStory();
+            }
+        });
+
+        // Controles de teclado
+        document.addEventListener('keydown', (e) => {
+            if (storyModal.style.display === 'flex') {
+                if (e.key === 'Escape') {
+                    closeStory();
+                } else if (e.key === 'ArrowRight') {
+                    nextStorySegment();
+                } else if (e.key === 'ArrowLeft') {
+                    previousStorySegment();
+                }
+            }
+        });
+        
+        // Inicializar botones
+        updateScrollButtons();
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+                
+            </div>
+        </div>
+    </div>
+    </header>
+        
+    </header>
+    <section class="c">
+        
+        
+    </section>
+    <aside class="d">
+        <h2><CEnter></CEnter></h2>
+    </aside>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
+<script>
+    
+       
+        function scrollStories(direction) {
+            const scrollAmount = 200;
+            scrollContainer.scrollBy({
+                left: direction * scrollAmount,
+                behavior: 'smooth'
+            });
+        }
+
+        function updateScrollButtons() {
+            const { scrollLeft, scrollWidth, clientWidth } = scrollContainer;
+            
+            leftBtn.style.display = scrollLeft > 0 ? 'flex' : 'none';
+            rightBtn.style.display = scrollLeft < scrollWidth - clientWidth - 1 ? 'flex' : 'none';
+        }
+
+        function openStory(miloj) {
+            console.log(`Abriendo historia de: ${milo.j}`);
+            // Aquí iría la lógica para abrir la historia
+        }
+
+        scrollContainer.addEventListener('scroll', updateScrollButtons);
+        window.addEventListener('resize', updateScrollButtons);
+        
+        // Inicializar botones
+        updateScrollButtons();
+    </script>
+    
+<script>
+    const scrollContainer = document.getElementById('storiesScroll');
+        const leftBtn = document.querySelector('.scroll-btn.left');
+        const rightBtn = document.querySelector('.scroll-btn.right');
+        const storyModal = document.getElementById('storyModal');
+        
+        let currentUser = null;
+        let currentStoryIndex = 0;
+        let storyTimer = null;
+        let usersList = Object.keys(storiesData);
+        let currentUserIndex = 0;
+
+        function scrollStories(direction) {
+            const scrollAmount = 200;
+            scrollContainer.scrollBy({
+                left: direction * scrollAmount,
+                behavior: 'smooth'
+            });
+        }
+
+        function updateScrollButtons() {
+            const { scrollLeft, scrollWidth, clientWidth } = scrollContainer;
+            
+            leftBtn.style.display = scrollLeft > 0 ? 'flex' : 'none';
+            rightBtn.style.display = scrollLeft < scrollWidth - clientWidth - 1 ? 'flex' : 'none';
+        }
+
+        function openStory(username, userIndex) {
+            currentUser = username;
+            currentUserIndex = userIndex;
+            currentStoryIndex = 0;
+            
+            const userData = storiesData[username];
+            document.getElementById('storyUsername').textContent = userData.username;
+            document.getElementById('storyUserAvatar').src = userData.avatar;
+            
+            createProgressBars(userData.stories.length);
+            loadStoryContent();
+            
+            storyModal.style.display = 'flex';
+            startStoryTimer();
+        }
+
+        function createProgressBars(count) {
+            const progressContainer = document.getElementById('storyProgress');
+            progressContainer.innerHTML = '';
+            
+            for (let i = 0; i < count; i++) {
+                const progressBar = document.createElement('div');
+                progressBar.className = 'progress-bar';
+                progressBar.innerHTML = '<div class="progress-fill"></div>';
+                progressContainer.appendChild(progressBar);
+            }
+        }
+
+        function loadStoryContent() {
+            const userData = storiesData[currentUser];
+            const storyContent = document.getElementById('storyContent');
+            storyContent.src = userData.stories[currentStoryIndex];
+            
+            updateProgressBars();
+        }
+
+        function updateProgressBars() {
+            const progressBars = document.querySelectorAll('.progress-fill');
+            const userData = storiesData[currentUser];
+            
+            progressBars.forEach((bar, index) => {
+                if (index < currentStoryIndex) {
+                    bar.style.width = '100%';
+                } else if (index === currentStoryIndex) {
+                    bar.style.width = '0%';
+                    // Animar la barra actual
+                    setTimeout(() => {
+                        bar.style.transition = 'width 5s linear';
+                        bar.style.width = '100%';
+                    }, 100);
+                } else {
+                    bar.style.width = '0%';
+                }
+            });
+        }
+
+        function startStoryTimer() {
+            clearTimeout(storyTimer);
+            storyTimer = setTimeout(() => {
+                nextStorySegment();
+            }, 5000); // 5 segundos por historia
+        }
+
+        function nextStorySegment() {
+            const userData = storiesData[currentUser];
+            
+            if (currentStoryIndex < userData.stories.length - 1) {
+                currentStoryIndex++;
+                loadStoryContent();
+                startStoryTimer();
+            } else {
+                nextUser();
+            }
+        }
+
+        function previousStorySegment() {
+            if (currentStoryIndex > 0) {
+                currentStoryIndex--;
+                loadStoryContent();
+                startStoryTimer();
+            } else {
+                previousUser();
+            }
+        }
+
+        function nextUser() {
+            if (currentUserIndex < usersList.length - 1) {
+                currentUserIndex++;
+                openStory(usersList[currentUserIndex], currentUserIndex);
+            } else {
+                closeStory();
+            }
+        }
+
+        function previousUser() {
+            if (currentUserIndex > 0) {
+                currentUserIndex--;
+                const userData = storiesData[usersList[currentUserIndex]];
+                currentStoryIndex = userData.stories.length - 1; // Ir al final de las historias del usuario anterior
+                openStory(usersList[currentUserIndex], currentUserIndex);
+            }
+        }
+
+        function closeStory() {
+            storyModal.style.display = 'none';
+            clearTimeout(storyTimer);
+            currentUser = null;
+            currentStoryIndex = 0;
+        }
+
+        // Event listeners
+        scrollContainer.addEventListener('scroll', updateScrollButtons);
+        window.addEventListener('resize', updateScrollButtons);
+
+        // Cerrar modal al hacer clic fuera
+        storyModal.addEventListener('click', (e) => {
+            if (e.target === storyModal) {
+                closeStory();
+            }
+        });
+
+        // Controles de teclado
+        document.addEventListener('keydown', (e) => {
+            if (storyModal.style.display === 'flex') {
+                if (e.key === 'Escape') {
+                    closeStory();
+                } else if (e.key === 'ArrowRight') {
+                    nextStorySegment();
+                } else if (e.key === 'ArrowLeft') {
+                    previousStorySegment();
+                }
+            }
+        });
+        
+        // Inicializar botones
+        updateScrollButtons();
+    </script>
+</script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
+</body>
+
+</html> 
